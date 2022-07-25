@@ -133,7 +133,7 @@ void World::createWorld(unsigned long long width, unsigned long long height){
 //" printHeightMap() {{{2
 void World::printHeightMap(){
     int i = 0, j = 0;
-    const int espacio = 2;
+    const int espacio = 1;
     for(auto row: elevation){
         for(auto elem: row){
             if(elem <= 0 || river[i][j])
@@ -159,6 +159,24 @@ void World::printHeightMap(){
 }   
 //" ~World() {{{2
 World::~ World(){}      
+
+// draw(renderer) {{{2
+void World::draw(SDL_Renderer* renderer){
+	for(std::size_t j = 0; j < elevation.size(); ++j){
+		for(std::size_t i = 0; i < elevation[0].size(); ++i){
+			if(elevation[j][i] > 0 && !river[j][i]){
+				SDL_SetRenderDrawColor(renderer, 255*(elevation[j][i]/maxElevation), 139, 255*(elevation[j][i]/maxElevation), 255);
+			}
+			else{
+				SDL_SetRenderDrawColor(renderer,  0, 0, 255*(1 - elevation[j][i]/minElevation), 255);
+				if(river[j][i])
+					SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+			}
+			SDL_RenderDrawPoint(renderer, i , j);
+		}
+	}
+}
+
 //" private {{{1  
 //" getLandPercentage(land, width , height) {{{2
 /*Gives the variable land the percentage of land that exists on the map*/
@@ -286,7 +304,7 @@ glm::vec3 World::surfaceNormal(int i, int j){
 /*Erodes the elevation map with hydraulic erosion */
 void World::Erode(){
     float minVol = 0.01f, friction = 0.05f, depositionRate = 0.1f, density = 1.0f, dt = 1.2f, evapRate = 0.01f;
-    int cycles = 200000; 
+    int cycles = 100000; 
 /*    for(int i = 0; i < 200000; i++){
 
         Vector2 newpos(random_int(1,elevation[0].size()-2),random_int(1, elevation.size()-2));
