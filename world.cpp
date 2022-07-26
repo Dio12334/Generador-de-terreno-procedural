@@ -113,11 +113,11 @@ void World::createWorld(unsigned long long width, unsigned long long height){
         expandElevationMap(width, height);
         getMinMaxElevation();
         normalizeMap(elevation, minElevation, maxElevation);
-        Erode();
         denormalizeMap(elevation, minElevation, maxElevation);
         getLandPercentage(land, width, height);
         water = 100.0 - land;
     }
+	Erode();
     adjustElevationMapSize(width, height);
     createRiverMap();
     printHeightMap();   

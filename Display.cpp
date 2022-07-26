@@ -1,7 +1,9 @@
 #include "Display.h"
+#include <SDL2/SDL_render.h>
+#include <SDL2/SDL_timer.h>
 #include <algorithm>
 
-Display::Display(): isRunning(false), window(nullptr), renderer(nullptr){}
+Display::Display(): isRunning(false), window(nullptr), renderer(nullptr), ticksCount(0){}
 
 bool Display::initialize(double dim){
 
@@ -14,7 +16,7 @@ bool Display::initialize(double dim){
     if(!window){
         SDL_Log("Falla en la creación de la ventana: %s", SDL_GetError());
     }
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     isRunning = true;
     
     screenSize = dim;
@@ -59,7 +61,10 @@ void Display::processInputs(){
 }
 
 void Display::updateDisplay(){
+	
+	while(!SDL_TICKS_PASSED(SDL_GetTicks(), ticksCount + 16));
 
+	ticksCount = SDL_GetTicks();
 }
 
 void Display::generateOutput(){
