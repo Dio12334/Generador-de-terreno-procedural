@@ -2,6 +2,7 @@
 #define WORLD_H
 
 #include <vector>
+#include <SDL2/SDL.h>
 #include "vectors.h"
 #include <glm/glm.hpp>
 
@@ -11,6 +12,7 @@ class World{
         void selectBiome();
         void createWorld(unsigned long long width=513, unsigned long long height=513);
         void printHeightMap();
+		void draw(SDL_Renderer* renderer);
         ~World();
     private:
         // Maps

@@ -1,6 +1,9 @@
-objects = main.o world.o functions.o
+objects = main.o world.o functions.o Display.o
+
 CFLAGS = -Wall -O2 
+LINKERFLAGS = -lSDL2
 debugflags = -g
+CC = g++
 execname = a.out
 
 ifeq ($(MAKECMDGOALS), debug)
@@ -12,10 +15,10 @@ all: build
 debug: clean build
 
 build: $(objects)
-	g++ $(CFLAGS) -o $(execname) $(objects) 
+	$(CC) $(CFLAGS) -o $(execname) $(objects) $(LINKERFLAGS)
 
 %.o : %.cpp
-	g++ -c $(CFLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $(LINKERFLAGS) $< -o $@
 
 .PHONY: clean cleanall
 clean:
@@ -23,3 +26,5 @@ clean:
 
 cleanall: clean
 	rm -f $(execname)
+
+
