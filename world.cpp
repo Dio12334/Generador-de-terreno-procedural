@@ -1,6 +1,7 @@
 #include "world.h"
 #include "functions.h"
 #include "vectors.h"
+#include <SDL2/SDL_render.h>
 #include <cmath>
 #include <fstream>
 #include <utility>
@@ -112,15 +113,17 @@ void World::createWorld(unsigned long long width, unsigned long long height){
         diamondSquare(elevation, iniSpread, iniMin, iniMax, side);
         expandElevationMap(width, height);
         getMinMaxElevation();
-        normalizeMap(elevation, minElevation, maxElevation);
-        denormalizeMap(elevation, minElevation, maxElevation);
+        //normalizeMap(elevation, minElevation, maxElevation);
+        //denormalizeMap(elevation, minElevation, maxElevation);
         getLandPercentage(land, width, height);
         water = 100.0 - land;
     }
+	normalizeMap(elevation, minElevation, maxElevation);
 	Erode();
+	denormalizeMap(elevation, minElevation, maxElevation);
     adjustElevationMapSize(width, height);
     createRiverMap();
-    printHeightMap();   
+    //printHeightMap();   
     std::cout<<"Land: "<<land<<"\%  Ocean: "<<100.0-land<<"\%\n"; 
     createTemperatureMap();
     createAPMap();
@@ -164,13 +167,40 @@ World::~ World(){}
 void World::draw(SDL_Renderer* renderer){
 	for(std::size_t j = 0; j < elevation.size(); ++j){
 		for(std::size_t i = 0; i < elevation[0].size(); ++i){
-			if(elevation[j][i] > 0 && !river[j][i]){
-				SDL_SetRenderDrawColor(renderer, 255*(elevation[j][i]/maxElevation), 139, 255*(elevation[j][i]/maxElevation), 255);
+			/* if(elevation[j][i] > 0 && !river[j][i]){ */
+			/* 	SDL_SetRenderDrawColor(renderer, 255*((temperature[j][i] <= 0)? 1:(elevation[j][i]/maxElevation)), 139, 255*((temperature[j][i] <= 0)? 1:(elevation[j][i]/maxElevation)), 255); */
+			/* } */
+			/* else{ */
+			/* 	SDL_SetRenderDrawColor(renderer,  0, 0, 255*(1 - elevation[j][i]/minElevation), 255); */
+			/* 	if(river[j][i]) */
+			/* 		SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); */
+			/* } */
+			if(river[j][i]){
+				SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+			}
+			else if(elevation[j][i] < -3){
+				SDL_SetRenderDrawColor(renderer, 0, 0, 30, 255);
+			}
+			else if(elevation[j][i] < -2){
+				SDL_SetRenderDrawColor(renderer, 0, 0, 130, 255);
+			}
+			else if(elevation[j][i] < -1){
+				SDL_SetRenderDrawColor(renderer, 0, 0, 200, 255);
+			}
+			else if(elevation[j][i] < 0){
+				SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+			}
+			else if(elevation[j][i] < 1){
+				SDL_SetRenderDrawColor(renderer, 220, 226, 198, 255);
+			}
+			else if(elevation[j][i] < 3){
+				SDL_SetRenderDrawColor(renderer, 0, 139, 0, 255);
+			}
+			else if(elevation[j][i] < 5){
+				SDL_SetRenderDrawColor(renderer, 139, 139, 139, 255);
 			}
 			else{
-				SDL_SetRenderDrawColor(renderer,  0, 0, 255*(1 - elevation[j][i]/minElevation), 255);
-				if(river[j][i])
-					SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 			}
 			SDL_RenderDrawPoint(renderer, i , j);
 		}
