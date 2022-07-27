@@ -19,8 +19,9 @@ void diamondSquare(std::vector<std::vector<T>>& noise, T randomSpread, T min, T 
     if(noise[side-1][side-1] == 0.0)
         noise[side-1][side-1] = random_number(min, max);
     
-    int chunkSize = side-1;
+    int chunkSize = side - 1;
     T spread = randomSpread;
+
     while(chunkSize > 1){
         int half = chunkSize/2;
         for(size_t i = 0; i < side-1; i+=chunkSize)
@@ -28,7 +29,7 @@ void diamondSquare(std::vector<std::vector<T>>& noise, T randomSpread, T min, T 
                 noise[i+half][j+half] = mean(noise[i][j],noise[i][j+chunkSize], noise[i+chunkSize][j], noise[i+chunkSize][j+chunkSize]) + random_number(-spread, spread);
         
         for(size_t i = 0; i < side;i+=half){
-            for(size_t j = (i+half)%chunkSize; j < side-1;j+=chunkSize){
+            for(size_t j = (i+half)%chunkSize; j < side;j+=chunkSize){
                 T sum = 0;
                 int count = 0;
                 if(i!=0){

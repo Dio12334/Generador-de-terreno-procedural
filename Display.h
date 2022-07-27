@@ -24,6 +24,7 @@ class Display{
         SDL_Renderer* renderer;
         int screenSize;
 		World mundo;
+		std::size_t ticksCount;
 
 };
 
