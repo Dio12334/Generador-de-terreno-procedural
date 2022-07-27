@@ -5,7 +5,7 @@
 
 int main(){
 	Display display;
-	double dim = 513;
+	double dim = 129;
 	if(display.initialize(dim))
 		display.runLoop();
 	display.shutdown();

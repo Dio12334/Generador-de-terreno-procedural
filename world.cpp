@@ -289,24 +289,6 @@ void World::xElevationExpansion(){
 }
 //" surfaceNormal(i, j) {{{2 
 /* creates the normal of the surface*/
-glm::vec3 World::surfaceNormal(int i, int j){
-    float scale = 60.0;
-	glm::vec3 n = glm::vec3(0.15) * glm::normalize(glm::vec3(scale*(elevation[i][j]-elevation[i+1][j]), 1.0, 0.0));  //Positive X
-	n += glm::vec3(0.15) * glm::normalize(glm::vec3(scale*(elevation[i-1][j]-elevation[i][j]), 1.0, 0.0));  //Negative X
-	n += glm::vec3(0.15) * glm::normalize(glm::vec3(0.0, 1.0, scale*(elevation[i][j]-elevation[i][j+1])));    //Positive Y
-	n += glm::vec3(0.15) * glm::normalize(glm::vec3(0.0, 1.0, scale*(elevation[i][j-1]-elevation[i][j])));  //Negative Y
-
-	//Diagonals! (This removes the last spatial artifacts)
-	n += glm::vec3(0.1) * glm::normalize(glm::vec3(scale*(elevation[i][j]-elevation[i+1][j+1])/sqrt(2), sqrt(2), scale*(elevation[i][j]-elevation[i+1][j+1])/sqrt(2)));    //Positive Y
-	n += glm::vec3(0.1) * glm::normalize(glm::vec3(scale*(elevation[i][j]-elevation[i+1][j-1])/sqrt(2), sqrt(2), scale*(elevation[i][j]-elevation[i+1][j-1])/sqrt(2)));    //Positive Y
-	n += glm::vec3(0.1) * glm::normalize(glm::vec3(scale*(elevation[i][j]-elevation[i-1][j+1])/sqrt(2), sqrt(2), scale*(elevation[i][j]-elevation[i-1][j+1])/sqrt(2)));    //Positive Y
-	n += glm::vec3(0.1) * glm::normalize(glm::vec3(scale*(elevation[i][j]-elevation[i-1][j-1])/sqrt(2), sqrt(2), scale*(elevation[i][j]-elevation[i-1][j-1])/sqrt(2)));    //Positive Y
-
-	return n;
-
-
-}
-
 Math::Vector<double> World::surfaceNormal(std::size_t i, std::size_t j){
 	using Math::Vector;
 	const double SQRT2 = 1.41421; 
@@ -347,10 +329,6 @@ void World::Erode(){
     while(drop.volume > minVol){
 		Vector<std::size_t> ipos = drop.position;                   //Floored Droplet Initial Position
 		Vector<double> n = surfaceNormal(ipos.x, ipos.y);  //Surface Normal at Position
-		/* glm::vec3 n2 = surfaceNormal((int)ipos.y, (int)ipos.x); */
-		/* std::cout << n << "\n"; */ 
-		/* std::cout << n2.x << " " << n2.y << " " << n2.z << "\n"; */
-
 		//Accelerate particle using newtonian mechanics using the surface normal.
 		drop.speed += dt*Vector<double>(n.x, n.z)/(drop.volume*density);//F = ma, so a = F/m
 		drop.position += dt*drop.speed;
@@ -447,48 +425,14 @@ void World::createAPMap(){
 //" creat eRiverMap () {{{2 
 /*Creates de river map*/
 void World::createRiverMap(){
-    
-    /*float minVol = 0.01f, friction = 0.05f, depositionRate = 0.1f, density = 1.0f, dt = 0.25f, evapRate = 0.001f;
+	using Math::Vector;
     std::vector<std::vector<bool>> mat(elevation.size(), std::vector<bool>(elevation[0].size(), false));
     river = mat;
-    for(int i = 0; i < 5; i++){
-        glm::vec2 newpos(random_int(1,elevation[0].size()-2),random_int(1, elevation.size()-2));
-        Particle drop(newpos);
-        //std::cout<<"------New drop------"<<std::endl;
-        while(drop.volume > minVol){
-            glm::ivec2 ipos = drop.pos;
-            //std::cout<<(int)drop.pos.x<<" "<<(int) drop.pos.y<<std::endl;
-            river[ipos.x][ipos.y] = true;
-            std::cout<<elevation[ipos.y-1][ipos.x]<<std::endl<<elevation[ipos.y][ipos.x-1]<<" "<<elevation[ipos.y][ipos.x]<<" "<<elevation[ipos.y][ipos.x+1]<<std::endl<<elevation[ipos.y+1][ipos.x]<<std::endl;
-            glm::vec3 n = surfaceNormal(ipos.x, ipos.y);
-            std::cout<<"normal: "<<n.x<<" "<<n.y<<" "<<n.z<<std::endl;
-            if(n.z == 1)
-                break;
-            drop.speed += glm::vec2(n.x,n.z)*(dt/(drop.volume*density));
-            std::cout<<"speed: "<<drop.speed.x<<" "<<drop.speed.y<<std::endl;
-            drop.pos += drop.speed*dt;
-            drop.speed *= (1.0f-dt*friction);
-
-            if(drop.pos.x < 1 || drop.pos.y < 1 ||  drop.pos.x >= elevation[0].size()-1|| drop.pos.y >= elevation.size()-1) 
-                break;
-
-            float maxsediment = drop.volume*glm::length(drop.speed)*(elevation[ipos.x][ipos.y]-elevation[(int)drop.pos.x][(int)drop.pos.y]);
-            if(maxsediment < 0.0) maxsediment = 0.0f;
-            float sdiff = maxsediment - drop.sediment;
-            drop.sediment += dt*depositionRate*sdiff;
-            elevation[ipos.x][ipos.y] -= dt*drop.volume*depositionRate*sdiff;
-            drop.volume *= (1.0-dt*evapRate);
-        }
-    }*/
-
-	using Math::Vector;
-     std::vector<std::vector<bool>> mat(elevation.size(), std::vector<bool>(elevation[0].size(), false));
-    river = mat;
-   for(int i = 0; i < 30; i++){
-       Vector<std::size_t> riv(random_int(1,elevation[0].size()-2),random_int(1, elevation.size()-2));
-       //std::cout<<"---nuevo rio---"<<std::endl;
-       //std::cout<<riv.x<<" "<<riv.y<<std::endl;
-        while(riv.x < elevation[0].size()-1 && riv.x > 0 && riv.y < elevation.size()-1 && riv.y > 0 && elevation[riv.y][riv.x] > 0 && !river[riv.y][riv.x]){
+	for(int i = 0; i < 30; i++){
+		Vector<std::size_t> riv(random_int(1,elevation[0].size()-2),random_int(1, elevation.size()-2));
+		//std::cout<<"---nuevo rio---"<<std::endl;
+		//std::cout<<riv.x<<" "<<riv.y<<std::endl;
+		while(riv.x < elevation[0].size()-1 && riv.x > 0 && riv.y < elevation.size()-1 && riv.y > 0 && elevation[riv.y][riv.x] > 0 && !river[riv.y][riv.x]){
             //std::cout<<riv.x<<" "<<riv.y<<std::endl;
             river[riv.y][riv.x] = true;
             float mini = 100;
@@ -508,7 +452,6 @@ void World::createRiverMap(){
             else{
                 riv.x++;
             }
-
         }
         river[riv.y][riv.x] = true;
    }

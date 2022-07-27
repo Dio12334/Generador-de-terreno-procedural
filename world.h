@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <SDL2/SDL.h>
-#include <glm/glm.hpp>
 #include "Vector.h"
 
 class World{
@@ -42,7 +41,6 @@ class World{
         void adjustElevationMapSize(unsigned long long width, unsigned long long height);
         void yElevationExpansion();
         void xElevationExpansion();
-        glm::vec3 surfaceNormal(int i, int j);
 		Math::Vector<double> surfaceNormal(std::size_t i, std::size_t j);
         void Erode();
 
