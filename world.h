@@ -3,8 +3,8 @@
 
 #include <vector>
 #include <SDL2/SDL.h>
-#include "vectors.h"
 #include <glm/glm.hpp>
+#include "Vector.h"
 
 class World{
     public:
@@ -14,6 +14,7 @@ class World{
         void printHeightMap();
 		void draw(SDL_Renderer* renderer);
         ~World();
+
     private:
         // Maps
         std::vector<std::vector<float>> elevation;
@@ -42,6 +43,7 @@ class World{
         void yElevationExpansion();
         void xElevationExpansion();
         glm::vec3 surfaceNormal(int i, int j);
+		Math::Vector<double> surfaceNormal(std::size_t i, std::size_t j);
         void Erode();
 
         // Temperature related functions
@@ -59,22 +61,22 @@ class World{
 };
 
 struct Particle{
-/*  Vector2 pos;
-  Vector2 speed;
-  float volume = 1.0f;
-  float sediment = 0.0f;
+ /* Particle(glm::vec2 _pos){ pos = _pos; } */
 
-  Particle(Vector2 pos){
-    this->pos.x = pos.x;
-    this->pos.y = pos.y;
-  }*/
- Particle(glm::vec2 _pos){ pos = _pos; }
+ /*  glm::vec2 pos; */
+ /*  glm::vec2 speed = glm::vec2(0.0); */
 
-  glm::vec2 pos;
-  glm::vec2 speed = glm::vec2(0.0);
+ /*  float volume = 1.0;   //This will vary in time */
+ /*  float sediment = 0.0; //Fraction of Volume that is Sediment! */
+	Math::Vector<double> position;
+	Math::Vector<double> speed = Math::Vector<double>(0, 0, 0);
 
-  float volume = 1.0;   //This will vary in time
-  float sediment = 0.0; //Fraction of Volume that is Sediment!
+	double volume = 1.0;
+	double sediment = 0.0;
+
+	Particle(Math::Vector<double> pos): position(pos){
+
+	}
 };
 
 #endif

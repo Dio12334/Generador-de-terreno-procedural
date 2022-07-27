@@ -1,7 +1,5 @@
 #include "world.h"
 #include "functions.h"
-#include "vectors.h"
-#include <SDL2/SDL_render.h>
 #include <cmath>
 #include <fstream>
 #include <utility>
@@ -293,89 +291,47 @@ void World::xElevationExpansion(){
 /* creates the normal of the surface*/
 glm::vec3 World::surfaceNormal(int i, int j){
     float scale = 60.0;
-    //Vector3 mul(0.15);
-/*    Vector3 n = mul*Vector3(scale*(elevation[i][j]-elevation[i+1][j]),1.0, 0.0).rnormalize();  //Positive X
-//    std::cout<<n.x<<" "<<n.y<<" "<<n.z<<"\n";
-    n += mul*Vector3(scale*(elevation[i-1][j]-elevation[i][j]),1.0, 0.0).rnormalize();  //Negative X
-//    std::cout<<n.x<<" "<<n.y<<" "<<n.z<<"\n";
-    n += mul*Vector3(0.0,1.0,  scale*(elevation[i][j]-elevation[i][j+1])).rnormalize();    //Positive Y
-//    std::cout<<n.x<<" "<<n.y<<" "<<n.z<<"\n";
-    n += mul*Vector3(0.0,1.0, scale*(elevation[i][j-1]-elevation[i][j])).rnormalize();  //Negative Y
- //   std::cout<<n.x<<" "<<n.y<<" "<<n.z<<"\n";
-    //Diagonals! (This removes the last spatial artifacts)
-    Vector3 mul2(0.1);
+	glm::vec3 n = glm::vec3(0.15) * glm::normalize(glm::vec3(scale*(elevation[i][j]-elevation[i+1][j]), 1.0, 0.0));  //Positive X
+	n += glm::vec3(0.15) * glm::normalize(glm::vec3(scale*(elevation[i-1][j]-elevation[i][j]), 1.0, 0.0));  //Negative X
+	n += glm::vec3(0.15) * glm::normalize(glm::vec3(0.0, 1.0, scale*(elevation[i][j]-elevation[i][j+1])));    //Positive Y
+	n += glm::vec3(0.15) * glm::normalize(glm::vec3(0.0, 1.0, scale*(elevation[i][j-1]-elevation[i][j])));  //Negative Y
 
-    n += mul2*Vector3(scale*(elevation[i][j]-elevation[i+1][j+1])/sqrt(2),sqrt(2), scale*(elevation[i][j]-elevation[i+1][j+1])/sqrt(2)).rnormalize();
-  //  std::cout<<n.x<<" "<<n.y<<" "<<n.z<<"\n";
-    n += mul2*Vector3(scale*(elevation[i][j]-elevation[i+1][j-1])/sqrt(2),sqrt(2), scale*(elevation[i][j]-elevation[i+1][j-1])/sqrt(2)).rnormalize();
-  //  std::cout<<n.x<<" "<<n.y<<" "<<n.z<<"\n";
-    n += mul2*Vector3(scale*(elevation[i][j]-elevation[i-1][j+1])/sqrt(2),sqrt(2), scale*(elevation[i][j]-elevation[i-1][j+1])/sqrt(2)).rnormalize();
-  //  std::cout<<n.x<<" "<<n.y<<" "<<n.z<<"\n";
-    n += mul2*Vector3(scale*(elevation[i][j]-elevation[i-1][j-1])/sqrt(2),sqrt(2), scale*(elevation[i][j]-elevation[i-1][j-1])/sqrt(2)).rnormalize();
+	//Diagonals! (This removes the last spatial artifacts)
+	n += glm::vec3(0.1) * glm::normalize(glm::vec3(scale*(elevation[i][j]-elevation[i+1][j+1])/sqrt(2), sqrt(2), scale*(elevation[i][j]-elevation[i+1][j+1])/sqrt(2)));    //Positive Y
+	n += glm::vec3(0.1) * glm::normalize(glm::vec3(scale*(elevation[i][j]-elevation[i+1][j-1])/sqrt(2), sqrt(2), scale*(elevation[i][j]-elevation[i+1][j-1])/sqrt(2)));    //Positive Y
+	n += glm::vec3(0.1) * glm::normalize(glm::vec3(scale*(elevation[i][j]-elevation[i-1][j+1])/sqrt(2), sqrt(2), scale*(elevation[i][j]-elevation[i-1][j+1])/sqrt(2)));    //Positive Y
+	n += glm::vec3(0.1) * glm::normalize(glm::vec3(scale*(elevation[i][j]-elevation[i-1][j-1])/sqrt(2), sqrt(2), scale*(elevation[i][j]-elevation[i-1][j-1])/sqrt(2)));    //Positive Y
 
-    //Vector3 n = Vector3(2*(elevation[y][x+1] - elevation[y][x-1]),2*(elevation[y+1][x]-elevation[y-1][x]),-4).rnormalize();
-    return n;*/
-  glm::vec3 n = glm::vec3(0.15) * glm::normalize(glm::vec3(scale*(elevation[i][j]-elevation[i+1][j]), 1.0, 0.0));  //Positive X
-  n += glm::vec3(0.15) * glm::normalize(glm::vec3(scale*(elevation[i-1][j]-elevation[i][j]), 1.0, 0.0));  //Negative X
-  n += glm::vec3(0.15) * glm::normalize(glm::vec3(0.0, 1.0, scale*(elevation[i][j]-elevation[i][j+1])));    //Positive Y
-  n += glm::vec3(0.15) * glm::normalize(glm::vec3(0.0, 1.0, scale*(elevation[i][j-1]-elevation[i][j])));  //Negative Y
-
-  //Diagonals! (This removes the last spatial artifacts)
-  n += glm::vec3(0.1) * glm::normalize(glm::vec3(scale*(elevation[i][j]-elevation[i+1][j+1])/sqrt(2), sqrt(2), scale*(elevation[i][j]-elevation[i+1][j+1])/sqrt(2)));    //Positive Y
-  n += glm::vec3(0.1) * glm::normalize(glm::vec3(scale*(elevation[i][j]-elevation[i+1][j-1])/sqrt(2), sqrt(2), scale*(elevation[i][j]-elevation[i+1][j-1])/sqrt(2)));    //Positive Y
-  n += glm::vec3(0.1) * glm::normalize(glm::vec3(scale*(elevation[i][j]-elevation[i-1][j+1])/sqrt(2), sqrt(2), scale*(elevation[i][j]-elevation[i-1][j+1])/sqrt(2)));    //Positive Y
-  n += glm::vec3(0.1) * glm::normalize(glm::vec3(scale*(elevation[i][j]-elevation[i-1][j-1])/sqrt(2), sqrt(2), scale*(elevation[i][j]-elevation[i-1][j-1])/sqrt(2)));    //Positive Y
-
-  return n;
+	return n;
 
 
-} 
+}
+
+Math::Vector<double> World::surfaceNormal(std::size_t i, std::size_t j){
+	using Math::Vector;
+	const double SQRT2 = 1.41421; 
+	double scale = 60.0;
+	Vector<double> n = Vector<double>(0.15, 0.15, 0.15) * Math::normalize(Vector<double>(scale*(elevation[i][j] - elevation[i+1][j]), 1.0, 0.0));
+	n += Vector<double>(0.15, 0.15, 0.15) * Math::normalize(Vector<double>(scale*(elevation[i-1][j] - elevation[i][j]), 1.0, 0.0)); 
+	n += Vector<double>(0.15, 0.15, 0.15) * Math::normalize(Vector<double>(0.0, 1.0, scale*(elevation[i][j] - elevation[i][j+1])));
+	n += Vector<double>(0.15, 0.15, 0.15) * Math::normalize(Vector<double>(0.0, 1.0, scale*(elevation[i][j-1] - elevation[i+1][j])));
+	
+	n += Vector<double>(0.1, 0.1, 0.1) * Math::normalize(Vector<double>(scale*(elevation[i][j] - elevation[i+1][j+1])/SQRT2, SQRT2, scale*(elevation[i][j] - elevation[i+1][j+1])/SQRT2));
+	n += Vector<double>(0.1, 0.1, 0.1) * Math::normalize(Vector<double>(scale*(elevation[i][j] - elevation[i+1][j-1])/SQRT2, SQRT2, scale*(elevation[i][j] - elevation[i+1][j-1])/SQRT2));
+	n += Vector<double>(0.1, 0.1, 0.1) * Math::normalize(Vector<double>(scale*(elevation[i][j] - elevation[i-1][j+1])/SQRT2, SQRT2, scale*(elevation[i][j] - elevation[i-1][j+1])/SQRT2));
+	n += Vector<double>(0.1, 0.1, 0.1) * Math::normalize(Vector<double>(scale*(elevation[i][j] - elevation[i-1][j-1])/SQRT2, SQRT2, scale*(elevation[i][j] - elevation[i-1][j-1])/SQRT2));
+
+	return n;
+
+}
 //" Erode(){{{2
 /*Erodes the elevation map with hydraulic erosion */
 void World::Erode(){
+	using Math::Vector;
     float minVol = 0.01f, friction = 0.05f, depositionRate = 0.1f, density = 1.0f, dt = 1.2f, evapRate = 0.01f;
-    int cycles = 100000; 
-/*    for(int i = 0; i < 200000; i++){
+    int cycles = 200000; 
 
-        Vector2 newpos(random_int(1,elevation[0].size()-2),random_int(1, elevation.size()-2));
-        
-        Particle drop(newpos);
-
-        while(drop.volume > minVol){
-
-            Vector2 ipos = drop.pos.intify();
-
-            Vector3 n = surfaceNormal(ipos.x, ipos.y); 
-            
-            if(n.z == 1)
-                break;
-
-            drop.speed += Vector2(n.x,n.z)*(dt/(drop.volume*density));
-
-            drop.pos += drop.speed*dt;
-
-            drop.speed *= (1.0f-dt*friction);
-
-            if(drop.pos.x < 1 || drop.pos.y < 1 ||  drop.pos.x >= elevation[0].size()-1|| drop.pos.y >= elevation.size()-1) 
-                break;
-
-            float maxsediment = drop.volume*drop.speed.lenght()*(elevation[ipos.x][ipos.y]-elevation[(int)drop.pos.x][(int)drop.pos.y]);
-            if(maxsediment < 0.0) maxsediment = 0.0f;
-            float sdiff = maxsediment - drop.sediment;
-            drop.sediment += dt*depositionRate*sdiff;
-            elevation[ipos.x][ipos.y] -= dt*drop.volume*depositionRate*sdiff;
-            drop.volume *= (1.0-dt*evapRate);
-
-            ---------- x
-            |
-            |
-            |
-            |
-            |
-            y
-        }
-    }*/
-    glm::vec2 dim(side-1,side-1);
+    Vector<std::size_t> dim(side-1,side-1);
   /*
     Note: Everything is properly scaled by a time step-size "dt"
   */
@@ -384,31 +340,33 @@ void World::Erode(){
   for(int i = 0; i < cycles; i++){
 
     //Spawn New Particle
-    glm::vec2 newpos = glm::vec2(random_int(1,elevation[0].size()-2), random_int(1,elevation.size()-2));
+    Vector<std::size_t> newpos(random_int(1,elevation[0].size()-2), random_int(1,elevation.size()-2));
     Particle drop(newpos);
 
     //As long as the droplet exists...
     while(drop.volume > minVol){
+		Vector<std::size_t> ipos = drop.position;                   //Floored Droplet Initial Position
+		Vector<double> n = surfaceNormal(ipos.x, ipos.y);  //Surface Normal at Position
+		/* glm::vec3 n2 = surfaceNormal((int)ipos.y, (int)ipos.x); */
+		/* std::cout << n << "\n"; */ 
+		/* std::cout << n2.x << " " << n2.y << " " << n2.z << "\n"; */
 
-      glm::ivec2 ipos = drop.pos;                   //Floored Droplet Initial Position
-      glm::vec3 n = surfaceNormal(ipos.x, ipos.y);  //Surface Normal at Position
+		//Accelerate particle using newtonian mechanics using the surface normal.
+		drop.speed += dt*Vector<double>(n.x, n.z)/(drop.volume*density);//F = ma, so a = F/m
+		drop.position += dt*drop.speed;
+		drop.speed *= (1.0-dt*friction);       //Friction Factor
 
-      //Accelerate particle using newtonian mechanics using the surface normal.
-      drop.speed += dt*glm::vec2(n.x, n.z)/(drop.volume*density);//F = ma, so a = F/m
-      drop.pos   += dt*drop.speed;
-      drop.speed *= (1.0-dt*friction);       //Friction Factor
+		/*
+			Note: For multiplied factors (e.g. friction, evaporation)
+			time-scaling is correctly implemented like above.
+		*/
 
-      /*
-        Note: For multiplied factors (e.g. friction, evaporation)
-        time-scaling is correctly implemented like above.
-      */
-
-      //Check if Particle is still in-bounds
-      if(!glm::all(glm::greaterThanEqual(drop.pos, glm::vec2(1))) ||
-         !glm::all(glm::lessThan(drop.pos, dim))) break;
+		//Check if Particle is still in-bounds
+		if(!(drop.position.x >= 1 && drop.position.y >= 1) || !(drop.position.x < dim.x && drop.position.y < dim.y))
+			break;
 
       //Compute sediment capacity difference
-      float maxsediment = drop.volume*glm::length(drop.speed)*(elevation[ipos.x][ipos.y]-elevation[(int)drop.pos.x][(int)drop.pos.y]);
+      double maxsediment = drop.volume*drop.speed.length()*(elevation[ipos.x][ipos.y]-elevation[(int)drop.position.x][(int)drop.position.y]);
       if(maxsediment < 0.0) maxsediment = 0.0;
       float sdiff = maxsediment - drop.sediment;
 
@@ -523,10 +481,11 @@ void World::createRiverMap(){
         }
     }*/
 
+	using Math::Vector;
      std::vector<std::vector<bool>> mat(elevation.size(), std::vector<bool>(elevation[0].size(), false));
     river = mat;
    for(int i = 0; i < 30; i++){
-       Vector2 riv(random_int(1,elevation[0].size()-2),random_int(1, elevation.size()-2));
+       Vector<std::size_t> riv(random_int(1,elevation[0].size()-2),random_int(1, elevation.size()-2));
        //std::cout<<"---nuevo rio---"<<std::endl;
        //std::cout<<riv.x<<" "<<riv.y<<std::endl;
         while(riv.x < elevation[0].size()-1 && riv.x > 0 && riv.y < elevation.size()-1 && riv.y > 0 && elevation[riv.y][riv.x] > 0 && !river[riv.y][riv.x]){
